@@ -3,8 +3,6 @@ import { database, storage } from '../firebase/config';
 import { addDoc, collection, getDocs, doc, deleteDoc, updateDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import './Productos-Index.css';
-import { Link } from "react-router-dom"; 
-
 
 function ProductosIndex() {
     const [nombre, setNombre] = useState('');
@@ -126,7 +124,6 @@ function ProductosIndex() {
                             <h1>{producto.nombre}</h1>
                             <p>Precio: ${producto.precio}</p>
                             <p>Stock: {producto.stock}</p>
-                            <Link to={`/productos/${producto.id}`} className="button-show">Ver</Link> 
                             <button className="button-edit" onClick={() => handleEdit(producto.id)}>Editar</button>
                             <button className="button-delete" onClick={() => handleDelete(producto.id)}>Eliminar</button>
                         </div>
