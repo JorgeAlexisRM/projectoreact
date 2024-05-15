@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { database, storage } from '../firebase/config';
+import { database, storage } from '../resource/firebase';
 import { addDoc, collection, getDocs, doc, deleteDoc, updateDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import './Productos-Index.css';
+import './Admin.css'
 
-function ProductosIndex() {
+function Admin() {
     const [nombre, setNombre] = useState('');
     const [precio, setPrecio] = useState('');
     const [stock, setStock] = useState('');
@@ -153,4 +153,4 @@ function ProductosIndex() {
     );
 }
 
-export default ProductosIndex;
+export default Admin;
