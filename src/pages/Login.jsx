@@ -2,6 +2,7 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import React, { useState } from "react";
 import { auth, database } from "../resource/firebase";
 import {doc, getDoc} from "firebase/firestore";
+import { Navigate } from "react-router-dom";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -121,7 +122,7 @@ const Login = () => {
             Don't have an account?
             <a
               className="ml-1 block font-sans text-sm font-bold leading-normal text-cyan-500 antialiased"
-              href="#signup"
+              href="/registro"
             >
               Sign up
             </a>
