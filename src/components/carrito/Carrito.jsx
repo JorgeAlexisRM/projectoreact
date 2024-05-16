@@ -79,7 +79,7 @@ const Carrito = () => {
     doc.text(`Total: ${total}`, 10, y + 12);
   
     doc.save('receipt.pdf');
-    
+
     // Guardar el documento como PDF
     const blobUrl = URL.createObjectURL(doc.output('blob'));
     setPdfUrl(blobUrl);
@@ -123,7 +123,8 @@ const Carrito = () => {
   };
 
   const handlePreview = () => {
-    generatePDF(cartProducts); // Generar el PDF antes de mostrar la previsualización
+    const total = cartProducts.reduce((acc, item) => acc + item.precio * item.quantity, 0);
+    generatePDF(cartProducts,total); // Generar el PDF antes de mostrar la previsualización
     setPreviewVisible(true);
   };
 
