@@ -116,6 +116,12 @@ function Admin() {
                 <input type="file" onChange={handleFileChange} />
                 <button className="button-add" onClick={handleCreate}>Agregar</button>
             </div>
+            <div>
+            <a
+              className="ml-1 block font-sans text-sm font-bold leading-normal text-cyan-500 antialiased"
+              href="/admin/ventas"
+            >Ventas</a>
+            </div>
             <div className="product-grid">
                 {productos.map(producto => (
                     <div key={producto.id} className="product-card">

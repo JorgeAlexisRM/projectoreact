@@ -5,7 +5,7 @@ import {useAuth} from '../context/AuthContext'
 const RutasPrivadas = () => {
   const { currentUser } = useAuth();
 
-  return currentUser.rol === 'admin' ? <Outlet /> : <Navigate to="/login" />;
+  return currentUser && currentUser.rol === 'admin' ? <Outlet /> : <Navigate to="/login" />;
 }
 
 export default RutasPrivadas
