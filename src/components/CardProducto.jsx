@@ -1,9 +1,9 @@
 import React from "react";
 
-const CardProducto = ({ producto, onClick }) => {
+const CardProducto = ({ producto, openModal }) => {
 
     return (
-        <div class="w-60 h-80 bg-gray-50 p-3 flex flex-col gap-1 rounded-2xl" onClick={onClick}>
+        <div class="w-60 h-80 bg-gray-50 p-3 flex flex-col gap-1 rounded-2xl" onClick={() => openModal(producto)}>
             <div class="h-48 bg-gray-700 rounded-xl">
             <img
                 src={producto.imagen}

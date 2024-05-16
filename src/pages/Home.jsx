@@ -3,6 +3,7 @@ import ListaProducto from '../components/ListaProducto'
 import NavBar from '../components/navbar/NavBar';
 
 const Home = () => {
+    
     return (
         <>
             <NavBar/>
@@ -10,5 +11,6 @@ const Home = () => {
         </>
     )
 }
+
 
 export default Home

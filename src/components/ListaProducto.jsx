@@ -18,22 +18,28 @@ const ListaProducto = () => {
         fetchProducts();
     }, []);
 
-    const manejarCardClick = (producto) => {
-        setSelectProducto(producto);
+    const openModal = (product) => {
+        setSelectProducto(product);
         setIsModalAbierto(true);
     }
 
-    const cerrarModal = () =>{
+    const closeModal = () =>{
         setIsModalAbierto(false);
         setSelectProducto(null);
     }
 
     return (
         <div className="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {products.map(product => (
-                <CardProducto key={product.id} producto={product} onClick={() => manejarCardClick(product)} />
+            {products.map((product) => (
+                <CardProducto key={product.id} producto={product} openModal={openModal} />
             ))}
-            {isModalAbierto && <ModalProducto product={selectProducto} cerrarModal={cerrarModal}/>}
+            {selectProducto && (
+                <ModalProducto
+                    isOpen={isModalAbierto}
+                    onClose={closeModal}
+                    product={selectProducto}
+                />
+            )}
         </div>
     );
 };
