@@ -1,11 +1,19 @@
-import React from 'react';
-import ProductosIndex from './vistas/Productos-Index';
+import './App.css';
+import NavBar from './components/navbar/NavBar';
+import { AuthProvider } from './context/AuthContext';
+import { CartProvider } from './context/CartContext';
+import Router1 from './routes/Router1';
 
 function App() {
   return (
-    <div className="App">
-      <ProductosIndex></ProductosIndex>
-    </div>
+    <>
+      <AuthProvider>
+        <CartProvider>
+          <NavBar/>
+          <Router1/>
+        </CartProvider>
+      </AuthProvider>
+    </>
   );
 }
 

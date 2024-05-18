@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { database, storage } from '../firebase/config';
+import { database, storage } from '../resource/firebase';
 import { addDoc, collection, getDocs, doc, deleteDoc, updateDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import './Productos-Index.css';
+import './Admin.css'
 
-function ProductosIndex() {
+function Admin() {
     const [nombre, setNombre] = useState('');
     const [precio, setPrecio] = useState('');
     const [stock, setStock] = useState('');
@@ -23,7 +23,7 @@ function ProductosIndex() {
             setProductos(dbVal.docs.map(doc => ({ ...doc.data(), id: doc.id })))
         }
         getData()
-    }, [productos])
+    }, [])
 
     const handleCreate = async () => {
         const storageRef = ref(storage, `imagenes/${imagen.name}`);
@@ -116,6 +116,12 @@ function ProductosIndex() {
                 <input type="file" onChange={handleFileChange} />
                 <button className="button-add" onClick={handleCreate}>Agregar</button>
             </div>
+            <div>
+            <a
+              className="ml-1 block font-sans text-sm font-bold leading-normal text-cyan-500 antialiased"
+              href="/admin/ventas"
+            >Ventas</a>
+            </div>
             <div className="product-grid">
                 {productos.map(producto => (
                     <div key={producto.id} className="product-card">
@@ -153,4 +159,4 @@ function ProductosIndex() {
     );
 }
 
-export default ProductosIndex;
+export default Admin;
