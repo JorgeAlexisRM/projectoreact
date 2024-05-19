@@ -30,15 +30,15 @@ const NavBar = () => {
                             <li>
                                 <NavLink to="/" class="text-gray-900 dark:text-white hover:underline" aria-current="page">Home</NavLink>
                             </li>
-                            <li>
-                                <NavLink to="#" class="text-gray-900 dark:text-white hover:underline">Company</NavLink>
-                            </li>
-                            <li>
-                                <NavLink to="#" class="text-gray-900 dark:text-white hover:underline">Team</NavLink>
-                            </li>
-                            <li>
-                                <NavLink to="#" class="text-gray-900 dark:text-white hover:underline">Features</NavLink>
-                            </li>
+                            {currentUser && currentUser.rol === 'admin' ? (
+                                <li>
+                                    <NavLink to="/admin" class="text-gray-900 dark:text-white hover:underline" aria-current="page">CRUD Productos</NavLink>
+                                </li>
+                            ) : (
+                                <li>
+                                    
+                                </li>
+                            )}
                             {currentUser ? (
                                 <li>
                                     <button
