@@ -17,6 +17,7 @@ const Carrito = () => {
 
   useEffect(() => {
     if (currentUser) {
+      console.log(currentUser)
       const fetchCartProducts = async () => {
         const q = query(collection(database, 'carrito_producto'), where('carritoId', '==', currentUser.uid));
         const querySnapshot = await getDocs(q);
@@ -31,6 +32,7 @@ const Carrito = () => {
           };
         });
         setCartProducts(products);
+        console.log(cartProducts)
       };
       fetchCartProducts();
     } else {
@@ -145,6 +147,7 @@ const Carrito = () => {
 
   const finalizarVenta = async () =>{
     const batch = writeBatch(database)
+    let totalPoints = 0;
 
     //Stock
     for (let item of cartProducts) {
@@ -154,6 +157,7 @@ const Carrito = () => {
         const productData = productSnap.data();
         const newStock = productData.stock - item.quantity;
         batch.update(productRef, { stock: newStock });
+        totalPoints += (Number(item.precio) * item.quantity) * 0.10;
       }
     }
 
@@ -173,6 +177,15 @@ const Carrito = () => {
 
     // Guardar venta en la colección "ventas"
     await addDoc(collection(database, 'ventas'), venta);
+
+    // Update user's points
+    const userRef = doc(database, 'usuarios', currentUser.uid);
+    const userSnap = await getDoc(userRef);
+    if (userSnap.exists()) {
+      const userData = userSnap.data();
+      const newPoints = Number(userData.points || 0) + Number(totalPoints);
+      batch.update(userRef, { points: newPoints });
+    }
 
     await batch.commit()
 

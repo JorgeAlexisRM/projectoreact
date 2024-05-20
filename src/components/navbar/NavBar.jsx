@@ -40,6 +40,7 @@ const NavBar = () => {
                                 </li>
                             )}
                             {currentUser ? (
+                                <>
                                 <li>
                                     <button
                                         onClick={mantenerLogout}
@@ -48,6 +49,10 @@ const NavBar = () => {
                                         Logout
                                     </button>
                                 </li>
+                                <li>
+                                    <NavLink to="tarjeta">Tarjeta</NavLink>
+                                </li>
+                                </>
                             ) : (
                                 <li>
                                     <NavLink to="login" className="text-sm text-blue-600 dark:text-blue-500 hover:underline">Login</NavLink>

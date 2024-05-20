@@ -5,6 +5,7 @@ import RutasPrivadas from './RutasPrivadas'
 import Admin from "../pages/Admin"
 import Carro from "../pages/Carro"
 import Ventas from '../pages/Ventas'
+import Tarjeta from '../pages/Tarjeta'
 
 const Router1 = () => {
   return (
@@ -16,6 +17,7 @@ const Router1 = () => {
           <Route path='ventas' element={<Ventas/>}/>
         </Route>
         <Route path="/cart" element={<Carro/>}/>
+        <Route path="/tarjeta" element={<Tarjeta />} />
       </Routes>
     </>
   )
