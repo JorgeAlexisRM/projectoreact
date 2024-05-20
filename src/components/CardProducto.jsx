@@ -19,6 +19,9 @@ const CardProducto = ({ producto, openModal }) => {
                 </div>
                 <span class="font-bold  text-red-600">{producto.precio}</span>
             </div>
+            <div>
+                <span class="font-bold  text-red-600">{producto.puntos}</span>
+            </div>
             <button class="hover:bg-sky-700 text-gray-50 bg-sky-800 py-2 rounded-md">
                 Add to cart
             </button>

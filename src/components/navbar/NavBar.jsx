@@ -3,7 +3,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext'
 import { signOut } from 'firebase/auth'
 import { auth } from '../../resource/firebase'
-import {CartContext} from '../../context/CartContext'
+import { CartContext } from '../../context/CartContext'
 
 const NavBar = () => {
     const { currentUser, logout } = useAuth()
@@ -15,7 +15,7 @@ const NavBar = () => {
             await signOut(auth)
             navigate("/login")
         } catch (error) {
-            console.error("Error signing out: ",error)
+            console.error("Error signing out: ", error)
         }
     }
 
@@ -36,21 +36,29 @@ const NavBar = () => {
                                 </li>
                             ) : (
                                 <li>
-                                    
+
                                 </li>
                             )}
                             {currentUser ? (
-                                <li>
-                                    <button
-                                        onClick={mantenerLogout}
-                                        className="text-sm text-blue-50 dark:text-blue-500 hover:underline"
-                                    >
-                                        Logout
-                                    </button>
-                                </li>
+                                <ul>
+                                    <li>
+                                        <button
+                                            onClick={mantenerLogout}
+                                            className="text-sm text-blue-50 dark:text-blue-500 hover:underline"
+                                        >
+                                            Logout
+                                        </button>
+                                    </li>
+
+                                    <li>
+                                        <button>
+                                            tarjeta
+                                        </button>
+                                    </li>
+                                </ul>
                             ) : (
                                 <li>
-                                <NavLink to="login" className="text-sm text-blue-600 dark:text-blue-500 hover:underline">Login</NavLink>
+                                    <NavLink to="login" className="text-sm text-blue-600 dark:text-blue-500 hover:underline">Login</NavLink>
                                 </li>
                             )}
                         </ul>
@@ -58,7 +66,7 @@ const NavBar = () => {
                             <NavLink to="/cart" className="relative text-gray-900 dark:text-white hover:underline">
                                 Cart
                                 <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full">
-                                {cartItemCount}
+                                    {cartItemCount}
                                 </span>
                             </NavLink>
                         </div>
