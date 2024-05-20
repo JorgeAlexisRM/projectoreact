@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { database } from '../resource/firebase';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, query, getDocs,limit, orderBy, startAfter } from 'firebase/firestore';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { Chart } from 'chart.js/auto';
@@ -33,35 +33,58 @@ const Ventas = () => {
     const [pdfUrl, setPdfUrl] = useState(null);
     const [showModal, setShowModal] = useState(false);
     const [modalContent, setModalContent] = useState(null);
+    const [lastVisible, setLastVisible] = useState(null);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        const fetchVentas = async () => {
-            const ventasSnapshot = await getDocs(collection(database, 'ventas'));
-            const ventasList = ventasSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            setVentas(ventasList);
-
-            const productCountTemp = {};
-            ventasList.forEach(venta => {
-                venta.products.forEach(product => {
-                    if (productCountTemp[product.name]) {
-                        productCountTemp[product.name] += product.quantity;
-                    } else {
-                        productCountTemp[product.name] = product.quantity;
-                    }
-                });
-            });
-
-            setProductCount(productCountTemp);
-
-            const sortedProducts = Object.entries(productCountTemp)
-                .sort((a, b) => b[1] - a[1])
-                .slice(0, 3)
-                .map(([name, count]) => ({ name, count }));
-            setTopProducts(sortedProducts);
-        };
-
         fetchVentas();
     }, []);
+
+    const fetchVentas = async () => {
+        setLoading(true)
+        const q = query(collection(database, 'ventas'), orderBy('date'),limit(10))
+        const ventasSnapshot = await getDocs(q);
+        const lastVisible = ventasSnapshot.docs[ventasSnapshot.docs.length -1]
+        setLastVisible(lastVisible)
+        const ventasList = ventasSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setVentas(ventasList);
+        setLoading(false)
+
+        const productCountTemp = {};
+        ventasList.forEach(venta => {
+            venta.products.forEach(product => {
+                if (productCountTemp[product.name]) {
+                    productCountTemp[product.name] += product.quantity;
+                } else {
+                    productCountTemp[product.name] = product.quantity;
+                }
+            });
+        });
+
+        setProductCount(productCountTemp);
+
+        const sortedProducts = Object.entries(productCountTemp)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 3)
+            .map(([name, count]) => ({ name, count }));
+        setTopProducts(sortedProducts);
+    };
+
+    const fetchMoreVentas = async () => {
+        setLoading(true)
+        const q = query(
+            collection(database, 'ventas'),
+            orderBy('date'),
+            startAfter(lastVisible),
+            limit(10)
+        );
+        const documentSnapshots = await getDocs(q);
+        const visible = documentSnapshots.docs[documentSnapshots.docs.length - 1];
+        setLastVisible(visible);
+        const salesArray = documentSnapshots.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+        setVentas((prevSales) => [...prevSales, ...salesArray]);
+        setLoading(false);
+    }
 
     const generatePDF = (venta) => {
         const doc = new jsPDF();
@@ -149,6 +172,12 @@ const Ventas = () => {
                     ))}
                 </tbody>
             </table>
+
+            {loading && <p>Cargando..</p>}
+            {!loading && lastVisible && (
+                <button onClick={fetchMoreVentas} >Cargar mas...</button>
+            )}
+
             <div className="mt-8 flex items-center">
                 <h2 className="text-xl font-bold mb-4">Top 3 de Productos Vendidos</h2>
 
