@@ -41,7 +41,7 @@ const ModalProducto = ({product, isOpen, onClose}) => {
           }
         } else {
           // Usuario no logueado
-          addCarritoTemp(product, quantity);
+          addCarritoTemp(product.nombre,product.precio,product.id, quantity);
         }
         onClose();
     };
