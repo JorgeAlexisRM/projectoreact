@@ -5,17 +5,17 @@ export const CartContext = createContext();
 export const CartProvider = ({ children }) => {
   const [tempCart, setTempCart] = useState([]);
 
-  const addCarritoTemp = (product, quantity) => {
+  const addCarritoTemp = (nombre, precio, productId, quantity) => {
     setTempCart(prevCart => {
-      const existingProduct = prevCart.find(item => item.product.id === product.id);
+      const existingProduct = prevCart.find(item => item.productId === productId);
       if (existingProduct) {
         return prevCart.map(item => 
-          item.product.id === product.id 
+          item.productId === productId 
             ? { ...item, quantity: item.quantity + quantity }
             : item
         );
       } else {
-        return [...prevCart, { product, quantity }];
+        return [...prevCart, { productId, nombre, precio, quantity }];
       }
     });
   };
