@@ -16,14 +16,19 @@ const Carrito = () => {
 
   useEffect(() => {
     if (currentUser) {
-      //console.log(currentUser);
-
       const fetchCartProducts = async () => {
         const q = query(collection(database, 'carrito_producto'), where('carritoId', '==', currentUser.uid));
         const querySnapshot = await getDocs(q);
-        //const products = querySnapshot.docs.map(doc => doc.data());
-        const products = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        console.log(products)
+        const products = querySnapshot.docs.map(doc => {
+          const data = doc.data();
+          return {
+            id: doc.id,
+            nombre: data.nombre || '',
+            quantity: data.quantity || 0,
+            precio: data.precio || 0,
+            productId: data.productId || ''
+          };
+        });
         setCartProducts(products);
       };
       fetchCartProducts();
@@ -31,11 +36,11 @@ const Carrito = () => {
       setCartProducts(tempCart);
     }
   }, [currentUser, tempCart]);
-
   
-  const generatePDF = (products, total) => {
+  
+  const generatePDF = (products, total, download = false) => {
     const doc = new jsPDF();
-     
+  
     // Añadir título
     doc.setFont("courier");
     doc.setFontSize(14);
@@ -60,11 +65,10 @@ const Carrito = () => {
     products.forEach((product, index) => {
       const productText = `${index + 1}. ${product.nombre} - Quantity: ${product.quantity} - Precio: $${product.precio}`;
       doc.text(productText, 10, y);
-      // Dibujar línea de puntos suspensivos debajo de cada producto
       doc.setLineWidth(0.5);
       doc.setDrawColor("#ccc");
-      doc.line(10, y + 5, 200, y + 5); // Ajusta las coordenadas según sea necesario
-      y += 10; // Ajusta el espacio entre líneas
+      doc.line(10, y + 5, 200, y + 5);
+      y += 10;
     });
   
     // Añadir línea divisoria
@@ -76,61 +80,66 @@ const Carrito = () => {
     doc.setTextColor("#333");
     doc.setFontSize(14);
     doc.setFont(undefined, 'bold');
-    doc.text(`Total: ${total}`, 10, y + 12);
+    doc.text(`Total: $${total.toFixed(2)}`, 10, y + 12);
   
-    doc.save('receipt.pdf');
-
-    // Guardar el documento como PDF
-    const blobUrl = URL.createObjectURL(doc.output('blob'));
-    setPdfUrl(blobUrl);
-  };  
-
-// doc.save('receipt.pdf');
-  const handleCheckout = async () => {
-    if (!currentUser) {
-      navigate('/login');
+    if (download) {
+      doc.save('receipt.pdf');
     } else {
-      try {
-        const total = cartProducts.reduce((acc, item) => acc + item.precio * item.quantity, 0);
-        const venta = {
-          userId: currentUser.uid,
-          products: cartProducts.map(item => ({
-            productId: item.productId,
-            name: item.nombre,
-            quantity: item.quantity,
-            price: item.precio
-          })),
-          total,
-          date: new Date()
-        };
-
-        // Guardar venta en la colección "ventas"
-        console.log(venta)
-        await addDoc(collection(database, 'ventas'), venta);
-        console.log(cartProducts.map(item => item.id))
-        // Eliminar productos del carrito
-        const carritoProductoRef = collection(database, 'carrito_producto');
-        await Promise.all(cartProducts.map(item => deleteDoc(doc(carritoProductoRef, item.id))));
-
-        setCartProducts([]);
-        clearTempCart();
-        console.log("Total:", total);
-        generatePDF(venta.products, total);
-      } catch (error) {
-        console.error('Error finalizing purchase: ', error);
-      }
+      const blobUrl = URL.createObjectURL(doc.output('blob'));
+      setPdfUrl(blobUrl);
     }
   };
+    
+
+// doc.save('receipt.pdf');
+const handleCheckout = async () => {
+  if (!currentUser) {
+    navigate('/login');
+  } else {
+    try {
+      const total = cartProducts.reduce((acc, item) => acc + item.precio * item.quantity, 0);
+      const venta = {
+        userId: currentUser.uid,
+        products: cartProducts.map(item => ({
+          productId: item.productId,
+          nombre: item.nombre,
+          quantity: item.quantity,
+          precio: item.precio
+        })),
+        total,
+        date: new Date()
+      };
+
+      // Guardar venta en la colección "ventas"
+      await addDoc(collection(database, 'ventas'), venta);
+
+      // Eliminar productos del carrito
+      const carritoProductoRef = collection(database, 'carrito_producto');
+      await Promise.all(cartProducts.map(item => deleteDoc(doc(carritoProductoRef, item.id))));
+
+      setCartProducts([]);
+      clearTempCart();
+
+      // Descargar PDF
+      generatePDF(venta.products, total, true);
+    } catch (error) {
+      console.error('Error finalizing purchase: ', error);
+    }
+  }
+};
+
 
   const handlePreview = () => {
-    const total = cartProducts.reduce((acc, item) => acc + item.precio * item.quantity, 0);
-    generatePDF(cartProducts,total); // Generar el PDF antes de mostrar la previsualización
+    const total = cartProducts.reduce((acc, item) => acc + item.precio * item.quantity, 0);
+    generatePDF(cartProducts, total, false); // Generar PDF sin descargar
     setPreviewVisible(true);
   };
 
+  //const shouldRenderPreview = previewVisible && pdfUrl;
+
   return (
     <div>
-      <h2>Your Cart</h2>
+      <h2>Tus Productos</h2>
       {cartProducts.length > 0 ? (
         <ul>
           {cartProducts.map((item, index) => (
@@ -140,25 +149,19 @@ const Carrito = () => {
           ))}
         </ul>
       ) : (
-        <p>No products in cart.</p>
+        <p>No hay productos en el carrito.</p>
       )}
       <button onClick={handleCheckout}>
-        Finalize Purchase
+        Finalizar Compra
       </button>
-      <button onClick={handlePreview}>Preview</button>
-     
-      {previewVisible && (
-        <div className="modal">
-          <div className="modal-content">
-            <span className="close" onClick={() => setPreviewVisible(false)}>&times;</span>
-            <h2>Preview</h2>
-            {pdfUrl && <iframe src={pdfUrl} style={{ width: '100%', height: '500px' }} />}
-          </div>
-        </div>
+      <button onClick={handlePreview}>Previsualizar</button>
+  
+      {previewVisible && pdfUrl && (
+        <iframe src={pdfUrl} style={{ width: '100%', height: '500px', marginTop: '20px' }} />
       )}
-
     </div>
   );
+  
 };
 
 export default Carrito;
